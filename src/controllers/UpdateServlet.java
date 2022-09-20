@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 
 import javax.persistence.EntityManager;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,11 +34,14 @@ public class UpdateServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
          String _token = request.getParameter("_token");
-            if(_token != null && _token.equals(request.getSession().getId())) {
+            if(_token != null && _token.equals(request.getSession().getId()) && request.getSession().getAttribute("task_id") !=null) {
                 EntityManager em = DBUtil.createEntityManager();
 
                 // セッションスコープからメッセージのIDを取得して
                 // 該当のIDのメッセージ1件のみをデータベースから取得
+                //System.out.println(_token);
+                //System.out.println(request.getSession().getId());
+                //System.out.println("hello"+(Integer)(request.getSession().getAttribute("task_id")));
                 Task m = em.find(Task.class, (Integer)(request.getSession().getAttribute("task_id")));
 
 
@@ -58,7 +62,11 @@ public class UpdateServlet extends HttpServlet {
 
                 // indexページへリダイレクト
                 response.sendRedirect(request.getContextPath() + "/index");
+            } else {
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/tasks/error.jsp");
+                rd.forward(request, response);
             }
+
         }
 
 }
